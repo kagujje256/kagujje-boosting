@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase-client";
+import { ThemeCustomizer } from "./theme-customizer";
 import toast from "react-hot-toast";
 import {
   LayoutDashboard, Package, ShoppingCart, Wallet, Ticket, 
@@ -61,6 +62,11 @@ export function AdminSidebar() {
           );
         })}
       </nav>
+
+      {/* Theme Customizer */}
+      <div className="px-3 py-2 border-t border-[var(--border)]">
+        <ThemeCustomizer />
+      </div>
 
       <div className="space-y-1 border-t border-[var(--border)] p-3">
         <Link
