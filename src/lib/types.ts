@@ -27,54 +27,71 @@ export interface Category {
 export interface Service {
   id: string;
   name: string;
-  slug: string;
-  category_id: string;
-  description: string | null;
+  category_id: string | null;
+  category?: Category;
+  provider_id: string | null;
+  external_service_id: string | null;
+  description: string;
   min_order: number;
   max_order: number;
   price_per_unit: number;
-  original_price: number | null;
-  provider: string | null;
-  provider_service_id: string | null;
-  refill: boolean;
-  refill_days: number;
-  speed: string;
-  quality: string;
-  average_time: string | null;
-  is_visible: boolean;
-  is_featured: boolean;
-  display_order: number;
-  category?: Category;
+  cost_price: number;
+  profit_percent: number;
+  currency: string;
+  unit: string;
+  is_active: boolean;
+  is_featured?: boolean;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface Order {
   id: string;
   user_id: string;
   service_id: string;
-  link: string;
+  service?: Service;
+  provider_id: string | null;
+  external_order_id: string | null;
   quantity: number;
+  link: string;
+  status: string;
   price: number;
-  start_count: number | null;
-  remains: number | null;
-  status: 'pending' | 'processing' | 'in_progress' | 'completed' | 'partial' | 'cancelled' | 'refunded';
-  provider_order_id: string | null;
+  cost_price: number;
+  profit: number;
+  currency: string;
   created_at: string;
   updated_at: string;
-  completed_at: string | null;
-  service?: Service;
 }
 
 export interface Transaction {
   id: string;
   user_id: string;
-  type: 'deposit' | 'withdrawal' | 'order' | 'refund' | 'bonus' | 'referral';
+  type: 'deposit' | 'order' | 'refund';
   amount: number;
-  balance_after: number | null;
-  reference: string | null;
-  payment_method: string | null;
-  payment_reference: string | null;
-  status: 'pending' | 'completed' | 'failed' | 'cancelled';
-  metadata: Record<string, unknown> | null;
+  currency: string;
+  amount_usd: number;
+  description: string | null;
+  reference_id: string | null;
+  status: string;
+  created_at: string;
+}
+
+export interface ExchangeRate {
+  id: string;
+  from_currency: string;
+  to_currency: string;
+  rate: number;
+  updated_at: string;
+}
+
+export interface ProfitAnalytics {
+  id: string;
+  date: string;
+  total_orders: number;
+  total_revenue: number;
+  total_cost: number;
+  total_profit: number;
+  currency: string;
   created_at: string;
 }
 

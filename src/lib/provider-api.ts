@@ -123,3 +123,28 @@ export async function syncProviderServices(
   
   return { added, updated };
 }
+
+// Helper function to call provider API directly
+export async function callProviderAPI(
+  provider: { url: string; key: string },
+  action: string,
+  params: Record<string, string | number> = {}
+): Promise<any> {
+  const formData = new URLSearchParams();
+  formData.append('key', provider.key);
+  formData.append('action', action);
+  
+  Object.entries(params).forEach(([key, value]) => {
+    formData.append(key, String(value));
+  });
+
+  const response = await fetch(provider.url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+    },
+    body: formData.toString(),
+  });
+
+  return response.json();
+}

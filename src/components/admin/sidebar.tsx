@@ -6,17 +6,17 @@ import { createClient } from "@/lib/supabase-client";
 import toast from "react-hot-toast";
 import {
   LayoutDashboard, Package, ShoppingCart, Wallet, Ticket, 
-  Settings, LogOut, ExternalLink, Server, Globe, Users
+  Settings, LogOut, ExternalLink, Server, Globe, Users, TrendingUp
 } from "lucide-react";
 
 const navItems = [
-  { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/services", label: "Services", icon: Package },
-  { href: "/orders", label: "Orders", icon: ShoppingCart },
-  { href: "/providers", label: "Providers", icon: Server },
-  { href: "/add-funds", label: "Add Funds", icon: Wallet },
-  { href: "/tickets", label: "Support", icon: Ticket },
-  { href: "/settings", label: "Settings", icon: Settings },
+  { href: "/admin/dashboard", label: "Dashboard", icon: LayoutDashboard },
+  { href: "/admin/analytics", label: "Analytics", icon: TrendingUp },
+  { href: "/admin/providers", label: "Providers", icon: Server },
+  { href: "/admin/services", label: "Services", icon: Package },
+  { href: "/admin/orders", label: "Orders", icon: ShoppingCart },
+  { href: "/admin/users", label: "Users", icon: Users },
+  { href: "/admin/settings", label: "Settings", icon: Settings },
 ];
 
 export function AdminSidebar() {
