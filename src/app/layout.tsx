@@ -1,39 +1,62 @@
 import type { Metadata } from "next";
+import { Inter, Playfair_Display } from "next/font/google";
 import { Toaster } from "react-hot-toast";
+import { ThemeProvider } from "@/lib/theme-context";
 import "./globals.css";
 
+const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
+const playfair = Playfair_Display({ subsets: ["latin"], variable: "--font-playfair" });
+
 export const metadata: Metadata = {
-  title: "KAGUJJE Boosting - Uganda's #1 SMM Panel",
-  description: "Supercharge your social media growth with KAGUJJE Boosting. Get Instagram followers, TikTok views, YouTube subscribers and more at the best prices in Uganda.",
-  keywords: ["SMM Panel", "Social Media Marketing", "Instagram followers", "TikTok views", "YouTube subscribers", "Uganda"],
+  title: "KAGUJJE Boost — Uganda's #1 SMM Panel",
+  description: "Supercharge your social media growth with real followers, views, and engagement. Instagram, TikTok, YouTube & more.",
+  keywords: ["SMM panel", "social media marketing", "buy followers", "Uganda", "KAGUJJE"],
+  authors: [{ name: "KAGUJJE" }],
   openGraph: {
-    title: "KAGUJJE Boosting - Uganda's #1 SMM Panel",
-    description: "Supercharge your social media growth with KAGUJJE Boosting",
+    title: "KAGUJJE Boost — Uganda's #1 SMM Panel",
+    description: "Supercharge your social media growth",
     type: "website",
-    url: "https://boosting.kagujje.com",
+    locale: "en_UG",
   },
 };
 
 export default function RootLayout({
   children,
-}: Readonly<{ children: React.ReactNode }>) {
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <html lang="en" className="dark">
       <head>
-        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet" />
-      </head>
-      <body className="antialiased">
-        <Toaster
-          position="top-right"
-          toastOptions={{
-            style: {
-              background: "var(--bg-secondary)",
-              color: "var(--text-primary)",
-              border: "1px solid var(--border)",
-            },
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                try {
+                  var theme = localStorage.getItem('boosting-theme');
+                  if (theme) {
+                    document.documentElement.classList.add(theme);
+                  }
+                } catch (e) {}
+              })();
+            `,
           }}
         />
-        {children}
+      </head>
+      <body className={`${inter.variable} ${playfair.variable} font-sans antialiased`}>
+        <ThemeProvider>
+          <Toaster
+            position="top-right"
+            toastOptions={{
+              style: {
+                background: "var(--bg-secondary)",
+                color: "var(--text-primary)",
+                border: "1px solid var(--border)",
+              },
+            }}
+          />
+          {children}
+        </ThemeProvider>
       </body>
     </html>
   );
