@@ -1,67 +1,108 @@
-# KAGUJJE Boosting - Setup Guide
+# KAGUJJE Boosting - Complete Setup Guide
 
-## GitHub Repository
-✅ Pushed to: https://github.com/kagujje256/kagujje-boosting
+## ✅ Current Status
+- **Site:** https://boosting.kagujje.com - LIVE
+- **Supabase:** Connected ✅
+- **Auth Page:** Working ✅
+- **Admin:** Protected (redirects to login) ✅
 
-## Step 1: Run Database Schema
+---
 
-**Open Supabase SQL Editor:** https://supabase.com/dashboard/project/dtejfdquiqogwapjtfar/sql
+## 🔧 Setup Google OAuth
 
-Copy the entire contents of `supabase/schema.sql` and run it.
+### Step 1: Get Google OAuth Credentials
 
-## Step 2: Deploy to Vercel
-
-1. Go to https://vercel.com/new
-2. Import the repository: `kagujje256/kagujje-boosting`
-3. Set environment variables:
+1. Go to: https://console.cloud.google.com
+2. Create a new project or select existing
+3. Go to **APIs & Services** → **Credentials**
+4. Click **Create Credentials** → **OAuth client ID**
+5. Select **Web application**
+6. Add authorized redirect URIs:
    ```
-   NEXT_PUBLIC_SUPABASE_URL=https://dtejfdquiqogwapjtfar.supabase.co
-   NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR0ZWpmZHF1aXFvZ3dhcGp0ZmFyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDQ0MDA4NjcsImV4cCI6MjA1OTk3Njg2N30.s_7FfO6KG5FQbN4p4QcLkT0M6xB1Pa0cIL-6gC6w9pU
+   https://dtejfdquiqogwapjtfar.supabase.co/auth/v1/callback
    ```
-4. Deploy!
+7. Click **Create**
+8. Copy the **Client ID** and **Client Secret**
 
-## Step 3: Add Custom Domain
+### Step 2: Configure Supabase Auth
 
-In Vercel dashboard:
-1. Go to Settings → Domains
-2. Add: `boosting.kagujje.com`
-3. Copy the CNAME value
-4. In Spaceship DNS, add CNAME record:
-   - Name: `boosting`
-   - Value: (the CNAME from Vercel)
+1. Go to: https://supabase.com/dashboard/project/dtejfdquiqogwapjtfar/auth/providers
+2. Find **Google** in the list
+3. Toggle it **ON**
+4. Enter your Google **Client ID** and **Client Secret**
+5. Click **Save**
 
-## MarzPay Integration
+### Step 3: Create Admin User
 
-The payment system is ready to integrate with MarzPay. Add your API credentials in Supabase settings table:
+Run this SQL in Supabase SQL Editor:
 
 ```sql
-UPDATE settings SET value = 'YOUR_MARZPAY_API_KEY' WHERE key = 'marzpay_api_key';
-UPDATE settings SET value = 'YOUR_MARZPAY_API_SECRET' WHERE key = 'marzpay_api_secret';
+-- Create admin user (run after signing up via the website)
+-- First, sign up through the website, then run:
+
+UPDATE profiles 
+SET role = 'admin', balance = 100000 
+WHERE email = 'dicksonkagujje@gmail.com';
 ```
 
-## Features
+---
 
-✅ **User Features:**
-- Social login (Google, GitHub, etc.)
-- Browse services by category
-- Place orders with quantity calculator
-- Track order status
-- Add funds via MarzPay
-- Referral system
-- Support tickets
-- API access
+## 🔑 Supabase Credentials (Already Configured)
 
-✅ **Admin Features:**
-- Manage services & categories
-- View all orders
-- User management
-- Announcement system
-- Payment tracking
+| Key | Value |
+|-----|-------|
+| URL | `https://dtejfdquiqogwapjtfar.supabase.co` |
+| Anon Key | `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...` (in code as fallback) |
 
-## Next Steps
+---
 
-1. Run the SQL schema in Supabase
-2. Deploy to Vercel
-3. Add domain `boosting.kagujje.com`
-4. Add MarzPay credentials
-5. Start adding services!
+## 📦 Add Providers (mrgoviral.com)
+
+Run this SQL in Supabase:
+
+```sql
+INSERT INTO providers (name, slug, api_url, api_key, currency, is_active, is_default)
+VALUES (
+  'MrGoViral',
+  'mrgoviral',
+  'https://mrgoviral.com/api/v2',
+  '3a821b733389666e0857a26011cdbc0c',
+  'USD',
+  true,
+  true
+);
+```
+
+---
+
+## 🚀 Quick Test Commands
+
+```bash
+# Test the site
+curl -I https://boosting.kagujje.com
+
+# Check admin redirect
+curl -I https://boosting.kagujje.com/admin
+
+# Test services API
+curl https://boosting.kagujje.com/api/services
+```
+
+---
+
+## 📋 Next Steps
+
+1. [ ] Set up Google OAuth in Supabase
+2. [ ] Sign up on the website with Google
+3. [ ] Run SQL to make yourself admin
+4. [ ] Add mrgoviral.com as provider
+5. [ ] Sync services from provider
+
+---
+
+## 🔗 Important Links
+
+- **Site:** https://boosting.kagujje.com
+- **GitHub:** https://github.com/kagujje256/kagujje-boosting
+- **Supabase Dashboard:** https://supabase.com/dashboard/project/dtejfdquiqogwapjtfar
+- **Google Console:** https://console.cloud.google.com
