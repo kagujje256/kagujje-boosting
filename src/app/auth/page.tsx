@@ -3,15 +3,14 @@
 import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase-client";
-import { Zap, Mail, Lock, User, ArrowLeft } from "lucide-react";
+import { Zap, Lock, User, ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import toast from "react-hot-toast";
 
 function AuthForm() {
   const [isSignUp, setIsSignUp] = useState(false);
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
   
@@ -25,22 +24,42 @@ function AuthForm() {
     }
   }, [searchParams]);
 
-  const handleEmailAuth = async (e: React.FormEvent) => {
+  // Auto-generate email from username
+  const getEmail = () => `${username.toLowerCase().replace(/[^a-z0-9]/g, '')}@boost.kagujje.com`;
+
+  const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!username || !password) {
+      toast.error("Please enter username and password");
+      return;
+    }
+    if (password.length < 6) {
+      toast.error("Password must be at least 6 characters");
+      return;
+    }
+    
     setLoading(true);
+    const email = getEmail();
 
     try {
       if (isSignUp) {
-        const { error } = await supabase.auth.signUp({
+        const { data, error } = await supabase.auth.signUp({
           email,
           password,
           options: {
             data: { username },
-            emailRedirectTo: `${window.location.origin}/auth/callback`,
           },
         });
         if (error) throw error;
-        toast.success("Check your email to confirm your account!");
+        
+        // Check if user already exists
+        if (data.user && !data.session) {
+          toast.success("Account created! You can now sign in.");
+          setIsSignUp(false);
+        } else {
+          toast.success("Welcome to KAGUJJE Boost!");
+          router.push("/dashboard");
+        }
       } else {
         const { error } = await supabase.auth.signInWithPassword({
           email,
@@ -51,7 +70,14 @@ function AuthForm() {
         router.push("/dashboard");
       }
     } catch (error: unknown) {
-      toast.error(error instanceof Error ? error.message : "An error occurred");
+      const message = error instanceof Error ? error.message : "An error occurred";
+      if (message.includes("already registered")) {
+        toast.error("Username already taken. Try another.");
+      } else if (message.includes("Invalid login")) {
+        toast.error("Invalid username or password");
+      } else {
+        toast.error(message);
+      }
     } finally {
       setLoading(false);
     }
@@ -94,7 +120,7 @@ function AuthForm() {
         </div>
 
         <div className="rounded-xl border border-[var(--border)] bg-[var(--bg-secondary)] p-6">
-          {/* Social Auth */}
+          {/* Google Auth */}
           <button
             onClick={handleGoogleAuth}
             disabled={googleLoading}
@@ -115,36 +141,20 @@ function AuthForm() {
             <div className="flex-1 border-t border-[var(--border)]" />
           </div>
 
-          {/* Email Auth */}
-          <form onSubmit={handleEmailAuth} className="space-y-4">
-            {isSignUp && (
-              <div>
-                <label className="block text-sm font-medium mb-2">Username</label>
-                <div className="relative">
-                  <User size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-secondary)]" />
-                  <input
-                    type="text"
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
-                    placeholder="yourusername"
-                    className="w-full rounded-lg border border-[var(--border)] bg-[var(--bg-tertiary)] py-3 pl-10 pr-4 focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
-                    required={isSignUp}
-                  />
-                </div>
-              </div>
-            )}
-
+          {/* Username/Password Auth */}
+          <form onSubmit={handleAuth} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium mb-2">Email</label>
+              <label className="block text-sm font-medium mb-2">Username</label>
               <div className="relative">
-                <Mail size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-secondary)]" />
+                <User size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-secondary)]" />
                 <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="you@example.com"
+                  type="text"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, ''))}
+                  placeholder="yourusername"
                   className="w-full rounded-lg border border-[var(--border)] bg-[var(--bg-tertiary)] py-3 pl-10 pr-4 focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
                   required
+                  autoComplete="username"
                 />
               </div>
             </div>
@@ -161,6 +171,7 @@ function AuthForm() {
                   className="w-full rounded-lg border border-[var(--border)] bg-[var(--bg-tertiary)] py-3 pl-10 pr-4 focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
                   required
                   minLength={6}
+                  autoComplete="current-password"
                 />
               </div>
             </div>
@@ -178,7 +189,7 @@ function AuthForm() {
             {isSignUp ? "Already have an account?" : "Don't have an account?"}{" "}
             <button
               onClick={() => setIsSignUp(!isSignUp)}
-              className="text-[var(--accent)] hover:underline"
+              className="text-[var(--accent)] hover:underline font-medium"
             >
               {isSignUp ? "Sign In" : "Create Account"}
             </button>
@@ -198,7 +209,7 @@ function AuthForm() {
 
 export default function AuthPage() {
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense fallback={<div className="flex min-h-screen items-center justify-center">Loading...</div>}>
       <AuthForm />
     </Suspense>
   );
