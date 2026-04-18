@@ -1,0 +1,14 @@
+{
+  "/_global-error/page": "app/_global-error/page.js",
+  "/_not-found/page": "app/_not-found/page.js",
+  "/add-funds/page": "app/add-funds/page.js",
+  "/api/payment/callback/route": "app/api/payment/callback/route.js",
+  "/api/payment/initiate/route": "app/api/payment/initiate/route.js",
+  "/auth/callback/route": "app/auth/callback/route.js",
+  "/auth/page": "app/auth/page.js",
+  "/dashboard/page": "app/dashboard/page.js",
+  "/order/[id]/page": "app/order/[id]/page.js",
+  "/orders/page": "app/orders/page.js",
+  "/page": "app/page.js",
+  "/services/page": "app/services/page.js"
+}
