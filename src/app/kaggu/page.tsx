@@ -8,7 +8,7 @@ export default async function AdminRootPage() {
   const { data: { user } } = await supabase.auth.getUser();
   
   if (!user) {
-    redirect("/auth?redirect=/admin");
+    redirect("/auth?redirect=/kaggu");
   }
   
   // Check if user is admin
@@ -22,5 +22,5 @@ export default async function AdminRootPage() {
     redirect("/dashboard");
   }
   
-  redirect("/admin/analytics");
+  redirect("/kaggu/dashboard");
 }

@@ -3,7 +3,7 @@ import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
 import { ProviderAPI, syncProviderServices } from '@/lib/provider-api';
 
-// GET /api/admin/providers - List all providers
+// GET /api/kaggu/providers - List all providers
 export async function GET(req: NextRequest) {
   const cookieStore = await cookies();
   const supabase = createServerClient(
@@ -39,7 +39,7 @@ export async function GET(req: NextRequest) {
   return NextResponse.json({ providers: providersWithBalance });
 }
 
-// POST /api/admin/providers - Add new provider
+// POST /api/kaggu/providers - Add new provider
 export async function POST(req: NextRequest) {
   const cookieStore = await cookies();
   const supabase = createServerClient(
@@ -71,7 +71,7 @@ export async function POST(req: NextRequest) {
   return NextResponse.json({ provider: data });
 }
 
-// PUT /api/admin/providers - Update provider
+// PUT /api/kaggu/providers - Update provider
 export async function PUT(req: NextRequest) {
   const cookieStore = await cookies();
   const supabase = createServerClient(
@@ -97,7 +97,7 @@ export async function PUT(req: NextRequest) {
   return NextResponse.json({ provider: data });
 }
 
-// DELETE /api/admin/providers - Delete provider
+// DELETE /api/kaggu/providers - Delete provider
 export async function DELETE(req: NextRequest) {
   const cookieStore = await cookies();
   const supabase = createServerClient(

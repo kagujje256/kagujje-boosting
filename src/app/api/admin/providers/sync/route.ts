@@ -3,7 +3,7 @@ import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
 import { ProviderAPI } from '@/lib/provider-api';
 
-// POST /api/admin/providers/sync - Sync services from provider
+// POST /api/kaggu/providers/sync - Sync services from provider
 export async function POST(req: NextRequest) {
   const cookieStore = await cookies();
   const supabase = createServerClient(
@@ -104,7 +104,7 @@ export async function POST(req: NextRequest) {
   }
 }
 
-// GET /api/admin/providers/sync - Test provider connection
+// GET /api/kaggu/providers/sync - Test provider connection
 export async function GET(req: NextRequest) {
   const cookieStore = await cookies();
   const supabase = createServerClient(

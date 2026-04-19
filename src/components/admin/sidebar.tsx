@@ -3,27 +3,29 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase-client";
-import { ThemeCustomizer } from "./theme-customizer";
 import toast from "react-hot-toast";
 import {
   LayoutDashboard, Package, ShoppingCart, Wallet, Ticket, 
-  Settings, LogOut, ExternalLink, Server, Globe, Users, TrendingUp
+  Settings, LogOut, ExternalLink, Server, Globe, Users, TrendingUp, Palette
 } from "lucide-react";
+import { useTheme } from "@/lib/theme-context";
 
 const navItems = [
-  { href: "/admin/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/admin/analytics", label: "Analytics", icon: TrendingUp },
-  { href: "/admin/providers", label: "Providers", icon: Server },
-  { href: "/admin/services", label: "Services", icon: Package },
-  { href: "/admin/orders", label: "Orders", icon: ShoppingCart },
-  { href: "/admin/users", label: "Users", icon: Users },
-  { href: "/admin/settings", label: "Settings", icon: Settings },
+  { href: "/kaggu/dashboard", label: "Dashboard", icon: LayoutDashboard },
+  { href: "/kaggu/analytics", label: "Analytics", icon: TrendingUp },
+  { href: "/kaggu/providers", label: "Providers", icon: Server },
+  { href: "/kaggu/services", label: "Services", icon: Package },
+  { href: "/kaggu/orders", label: "Orders", icon: ShoppingCart },
+  { href: "/kaggu/users", label: "Users", icon: Users },
+  { href: "/kaggu/appearance", label: "Appearance", icon: Palette },
+  { href: "/kaggu/settings", label: "Settings", icon: Settings },
 ];
 
 export function AdminSidebar() {
   const pathname = usePathname();
   const router = useRouter();
   const supabase = createClient();
+  const { theme, colorTheme, toggleTheme, setColorTheme, glassyMode, toggleGlassyMode } = useTheme();
 
   async function handleLogout() {
     await supabase.auth.signOut();
@@ -38,7 +40,7 @@ export function AdminSidebar() {
           KAGUJJE
         </span>
         <span className="rounded-md bg-[var(--accent)]/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-[var(--accent)]">
-          Boost
+          Admin
         </span>
       </div>
 
@@ -63,9 +65,45 @@ export function AdminSidebar() {
         })}
       </nav>
 
-      {/* Theme Customizer */}
-      <div className="px-3 py-2 border-t border-[var(--border)]">
-        <ThemeCustomizer />
+      {/* Theme Quick Settings */}
+      <div className="border-t border-[var(--border)] p-4 space-y-3">
+        <div className="flex items-center justify-between">
+          <span className="text-xs text-[var(--text-secondary)]">Theme</span>
+          <button
+            onClick={toggleTheme}
+            className="rounded-full p-1.5 text-[var(--text-secondary)] hover:bg-[var(--bg-tertiary)] hover:text-[var(--accent)]"
+          >
+            {theme === "dark" ? "☀️" : "🌙"}
+          </button>
+        </div>
+        
+        <div className="flex items-center justify-between">
+          <span className="text-xs text-[var(--text-secondary)]">Glassy Mode</span>
+          <button
+            onClick={toggleGlassyMode}
+            className={`rounded-full p-1.5 transition-all ${
+              glassyMode 
+                ? "bg-[var(--accent)] text-black" 
+                : "text-[var(--text-secondary)] hover:bg-[var(--bg-tertiary)]"
+            }`}
+          >
+            ✨
+          </button>
+        </div>
+        
+        <div className="flex flex-wrap gap-1.5">
+          {["gold", "blue", "green", "purple", "orange", "pink", "cyan"].map((color) => (
+            <button
+              key={color}
+              onClick={() => setColorTheme(color as any)}
+              className={`w-6 h-6 rounded-full border-2 transition-all ${
+                colorTheme === color ? "border-white scale-110" : "border-transparent"
+              }`}
+              style={{ backgroundColor: getColorValue(color) }}
+              title={color.charAt(0).toUpperCase() + color.slice(1)}
+            />
+          ))}
+        </div>
       </div>
 
       <div className="space-y-1 border-t border-[var(--border)] p-3">
@@ -87,4 +125,17 @@ export function AdminSidebar() {
       </div>
     </aside>
   );
+}
+
+function getColorValue(color: string): string {
+  const colors: Record<string, string> = {
+    gold: "#c9a84c",
+    blue: "#3b82f6",
+    green: "#22c55e",
+    purple: "#a855f7",
+    orange: "#f97316",
+    pink: "#ec4899",
+    cyan: "#06b6d4",
+  };
+  return colors[color] || "#c9a84c";
 }

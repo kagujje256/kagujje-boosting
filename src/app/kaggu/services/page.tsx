@@ -17,7 +17,7 @@ export default function ServicesPage() {
 
   useEffect(() => {
     async function loadData() {
-      const res = await fetch("/api/admin/services");
+      const res = await fetch("/api/kaggu/services");
       const json = await res.json();
       if (json.success) {
         setServices(json.services);
@@ -30,7 +30,7 @@ export default function ServicesPage() {
 
   async function updateService(service: Service, updates: Partial<Service>) {
     setSaving(service.id);
-    const res = await fetch("/api/admin/services", {
+    const res = await fetch("/api/kaggu/services", {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ id: service.id, ...updates })
@@ -47,7 +47,7 @@ export default function ServicesPage() {
 
   async function syncFromProvider() {
     toast.loading("Syncing services from providers...");
-    const res = await fetch("/api/admin/providers/sync", { method: "POST" });
+    const res = await fetch("/api/kaggu/providers/sync", { method: "POST" });
     const json = await res.json();
     toast.dismiss();
     if (json.success) {

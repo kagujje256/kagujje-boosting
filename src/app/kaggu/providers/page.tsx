@@ -42,7 +42,7 @@ export default function ProvidersPage() {
   async function loadProviders() {
     setLoading(true);
     try {
-      const res = await fetch("/api/admin/providers");
+      const res = await fetch("/api/kaggu/providers");
       const data = await res.json();
       setProviders(data.providers || []);
     } catch (error) {
@@ -58,7 +58,7 @@ export default function ProvidersPage() {
   async function testConnection(providerId: string) {
     setTesting(providerId);
     try {
-      const res = await fetch(`/api/admin/providers/sync?providerId=${providerId}`);
+      const res = await fetch(`/api/kaggu/providers/sync?providerId=${providerId}`);
       const data = await res.json();
       
       if (data.status === 'connected') {
@@ -75,7 +75,7 @@ export default function ProvidersPage() {
   async function syncServices(providerId: string) {
     setSyncing(providerId);
     try {
-      const res = await fetch("/api/admin/providers/sync", {
+      const res = await fetch("/api/kaggu/providers/sync", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ providerId }),
@@ -98,7 +98,7 @@ export default function ProvidersPage() {
     e.preventDefault();
     
     try {
-      const res = await fetch("/api/admin/providers", {
+      const res = await fetch("/api/kaggu/providers", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(newProvider),
@@ -120,7 +120,7 @@ export default function ProvidersPage() {
 
   async function toggleActive(provider: Provider) {
     try {
-      await fetch("/api/admin/providers", {
+      await fetch("/api/kaggu/providers", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id: provider.id, is_active: !provider.is_active }),
@@ -136,7 +136,7 @@ export default function ProvidersPage() {
     if (!confirm("Delete this provider? Associated services will remain.")) return;
     
     try {
-      await fetch("/api/admin/providers", {
+      await fetch("/api/kaggu/providers", {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id }),

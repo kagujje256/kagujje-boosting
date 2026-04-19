@@ -42,7 +42,7 @@ export default function AnalyticsPage() {
       const endDate = new Date().toISOString().split('T')[0];
       const startDate = new Date(Date.now() - parseInt(period) * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
       
-      const res = await fetch(`/api/admin/analytics?start=${startDate}&end=${endDate}&currency=${currency}`);
+      const res = await fetch(`/api/kaggu/analytics?start=${startDate}&end=${endDate}&currency=${currency}`);
       const json = await res.json();
       if (json.success) {
         setData(json.data);

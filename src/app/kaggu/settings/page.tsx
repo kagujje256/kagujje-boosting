@@ -20,7 +20,7 @@ export default function SettingsPage() {
 
   useEffect(() => {
     async function loadSettings() {
-      const res = await fetch("/api/admin/settings");
+      const res = await fetch("/api/kaggu/settings");
       const json = await res.json();
       if (json.success) {
         setSettings(json.settings);
@@ -32,7 +32,7 @@ export default function SettingsPage() {
 
   async function handleSave() {
     setSaving(true);
-    const res = await fetch("/api/admin/settings", {
+    const res = await fetch("/api/kaggu/settings", {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(settings)

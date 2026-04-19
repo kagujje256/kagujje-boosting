@@ -8,8 +8,10 @@ type ColorTheme = "gold" | "blue" | "green" | "purple" | "orange" | "pink" | "cy
 interface ThemeContextType {
   theme: Theme;
   colorTheme: ColorTheme;
+  glassyMode: boolean;
   toggleTheme: () => void;
   setColorTheme: (color: ColorTheme) => void;
+  toggleGlassyMode: () => void;
 }
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
@@ -27,19 +29,22 @@ const colorThemes: Record<ColorTheme, { accent: string; accentHover: string }> =
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [theme, setTheme] = useState<Theme>("dark");
   const [colorTheme, setColorThemeState] = useState<ColorTheme>("gold");
+  const [glassyMode, setGlassyMode] = useState<boolean>(false);
 
   useEffect(() => {
-    // Load theme from localStorage
-    const savedTheme = localStorage.getItem("theme") as Theme | null;
-    const savedColor = localStorage.getItem("colorTheme") as ColorTheme | null;
+    const savedTheme = localStorage.getItem("boosting-theme") as Theme | null;
+    const savedColor = localStorage.getItem("boosting-colorTheme") as ColorTheme | null;
+    const savedGlassy = localStorage.getItem("boosting-glassy") === "true";
     
     if (savedTheme) setTheme(savedTheme);
     if (savedColor) setColorThemeState(savedColor);
+    if (savedGlassy !== null) setGlassyMode(savedGlassy);
   }, []);
 
   useEffect(() => {
-    // Apply theme
     const root = document.documentElement;
+    
+    // Apply theme
     root.classList.remove("light", "dark");
     root.classList.add(theme);
     
@@ -48,10 +53,18 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     root.style.setProperty("--accent", colors.accent);
     root.style.setProperty("--accent-hover", colors.accentHover);
     
+    // Apply glassy mode
+    if (glassyMode) {
+      root.classList.add("glassy");
+    } else {
+      root.classList.remove("glassy");
+    }
+    
     // Save to localStorage
-    localStorage.setItem("theme", theme);
-    localStorage.setItem("colorTheme", colorTheme);
-  }, [theme, colorTheme]);
+    localStorage.setItem("boosting-theme", theme);
+    localStorage.setItem("boosting-colorTheme", colorTheme);
+    localStorage.setItem("boosting-glassy", String(glassyMode));
+  }, [theme, colorTheme, glassyMode]);
 
   const toggleTheme = () => {
     setTheme((t) => (t === "dark" ? "light" : "dark"));
@@ -61,8 +74,12 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     setColorThemeState(color);
   };
 
+  const toggleGlassyMode = () => {
+    setGlassyMode((g) => !g);
+  };
+
   return (
-    <ThemeContext.Provider value={{ theme, colorTheme, toggleTheme, setColorTheme }}>
+    <ThemeContext.Provider value={{ theme, colorTheme, glassyMode, toggleTheme, setColorTheme, toggleGlassyMode }}>
       {children}
     </ThemeContext.Provider>
   );

@@ -33,7 +33,7 @@ export async function updateSession(request: NextRequest) {
   );
 
   // Protect admin routes
-  if (request.nextUrl.pathname.startsWith("/admin")) {
+  if (request.nextUrl.pathname.startsWith("/kaggu")) {
     const {
       data: { user },
     } = await supabase.auth.getUser();
