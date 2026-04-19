@@ -1,5 +1,11 @@
 @import "tailwindcss";
 
+/* Color Themes - Gold (Default) */
+:root {
+  --accent: #c9a84c;
+  --accent-hover: #d4b85c;
+}
+
 /* Dark Theme (Default) */
 :root {
   --bg-primary: #000000;
