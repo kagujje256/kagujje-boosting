@@ -4,8 +4,6 @@ import { Features } from "@/components/landing/features";
 import { Stats } from "@/components/landing/stats";
 import { Footer } from "@/components/layout/footer";
 
-export const dynamic = "force-dynamic";
-
 export default function HomePage() {
   return (
     <main className="min-h-screen">
