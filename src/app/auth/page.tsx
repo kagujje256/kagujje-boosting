@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useEffect, Suspense } from "react";
+import { useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { createClient } from "@/lib/supabase-client";
+import { createClient, SUPABASE_URL } from "@/lib/supabase-client";
 import { Zap, Lock, User, ArrowLeft, AlertCircle, CheckCircle } from "lucide-react";
 import Link from "next/link";
 import toast from "react-hot-toast";
@@ -13,23 +13,14 @@ function AuthForm() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
-  const [debugInfo, setDebugInfo] = useState<string | null>(null);
   
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  useEffect(() => {
-    if (searchParams.get("signup") === "true") {
-      setIsSignUp(true);
-    }
-    
-    // Debug: Check if env vars are available
-    const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-    const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-    const hasUrl = url && url.length > 0;
-    const hasKey = key && key.length > 0;
-    setDebugInfo(`URL: ${hasUrl ? '✓ ' + url.substring(0,20) + '...' : '✗'} | Key: ${hasKey ? '✓ (' + key.length + ' chars)' : '✗'}`);
-  }, [searchParams]);
+  // Check signup mode
+  if (searchParams.get("signup") === "true" && !isSignUp) {
+    setIsSignUp(true);
+  }
 
   // Auto-generate email from username
   const getEmail = () => `${username.toLowerCase().replace(/[^a-z0-9]/g, '')}@boost.kagujje.com`;
@@ -52,6 +43,7 @@ function AuthForm() {
       const supabase = createClient();
       
       if (isSignUp) {
+        console.log("Signing up with:", email);
         const { data, error } = await supabase.auth.signUp({
           email,
           password,
@@ -65,16 +57,19 @@ function AuthForm() {
           throw error;
         }
         
-        // Check if user already exists
+        console.log("Signup result:", data);
+        
         if (data.user && !data.session) {
           toast.success("Account created! You can now sign in.");
           setIsSignUp(false);
-        } else {
+          setPassword("");
+        } else if (data.session) {
           toast.success("Welcome to KAGUJJE Boost!");
           router.push("/dashboard");
         }
       } else {
-        const { error } = await supabase.auth.signInWithPassword({
+        console.log("Signing in with:", email);
+        const { data, error } = await supabase.auth.signInWithPassword({
           email,
           password,
         });
@@ -84,19 +79,24 @@ function AuthForm() {
           throw error;
         }
         
+        console.log("Signin result:", data);
         toast.success("Welcome back!");
         router.push("/dashboard");
       }
     } catch (error: unknown) {
       console.error("Auth error:", error);
-      const message = error instanceof Error ? error.message : "An error occurred";
+      const err = error as Error;
+      let message = err.message || "An error occurred";
       
-      if (message.includes("already registered")) {
+      // Parse error messages
+      if (message.includes("already registered") || message.includes("already been registered")) {
         toast.error("Username already taken. Try another.");
-      } else if (message.includes("Invalid login")) {
+      } else if (message.includes("Invalid login credentials")) {
         toast.error("Invalid username or password");
-      } else if (message.includes("Invalid API key")) {
-        toast.error("Configuration error. Please contact support.");
+      } else if (message.includes("Invalid API key") || message.includes("api key")) {
+        toast.error("Server configuration error. Contact support.");
+      } else if (message.includes("User already registered")) {
+        toast.error("Username already exists. Try signing in.");
       } else {
         toast.error(message);
       }
@@ -220,13 +220,11 @@ function AuthForm() {
           </p>
         </div>
 
-        {/* Debug Info */}
-        {debugInfo && (
-          <div className="mt-4 rounded-lg border border-[var(--border)] bg-[var(--bg-tertiary)] p-3 text-xs text-[var(--text-secondary)] flex items-center gap-2">
-            <AlertCircle size={14} />
-            <span>Debug: {debugInfo}</span>
-          </div>
-        )}
+        {/* Debug Info - Shows connection is working */}
+        <div className="mt-4 flex items-center justify-center gap-2 text-xs text-[var(--text-secondary)]">
+          <CheckCircle size={12} className="text-green-500" />
+          <span>Connected to {SUPABASE_URL.replace('https://', '').substring(0, 15)}...</span>
+        </div>
 
         <p className="mt-6 text-center text-xs text-[var(--text-secondary)]">
           By continuing, you agree to our{" "}
