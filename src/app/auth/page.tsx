@@ -3,7 +3,7 @@
 import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase-client";
-import { Zap, Lock, User, ArrowLeft } from "lucide-react";
+import { Zap, Lock, User, ArrowLeft, AlertCircle, CheckCircle } from "lucide-react";
 import Link from "next/link";
 import toast from "react-hot-toast";
 
@@ -13,15 +13,20 @@ function AuthForm() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
+  const [debugInfo, setDebugInfo] = useState<string | null>(null);
   
   const router = useRouter();
   const searchParams = useSearchParams();
-  const supabase = createClient();
 
   useEffect(() => {
     if (searchParams.get("signup") === "true") {
       setIsSignUp(true);
     }
+    
+    // Debug: Check if env vars are available
+    const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+    setDebugInfo(`URL: ${url ? '✓' : '✗'} | Key: ${key ? '✓' : '✗'}`);
   }, [searchParams]);
 
   // Auto-generate email from username
@@ -42,6 +47,8 @@ function AuthForm() {
     const email = getEmail();
 
     try {
+      const supabase = createClient();
+      
       if (isSignUp) {
         const { data, error } = await supabase.auth.signUp({
           email,
@@ -50,7 +57,11 @@ function AuthForm() {
             data: { username },
           },
         });
-        if (error) throw error;
+        
+        if (error) {
+          console.error("Signup error:", error);
+          throw error;
+        }
         
         // Check if user already exists
         if (data.user && !data.session) {
@@ -65,16 +76,25 @@ function AuthForm() {
           email,
           password,
         });
-        if (error) throw error;
+        
+        if (error) {
+          console.error("Signin error:", error);
+          throw error;
+        }
+        
         toast.success("Welcome back!");
         router.push("/dashboard");
       }
     } catch (error: unknown) {
+      console.error("Auth error:", error);
       const message = error instanceof Error ? error.message : "An error occurred";
+      
       if (message.includes("already registered")) {
         toast.error("Username already taken. Try another.");
       } else if (message.includes("Invalid login")) {
         toast.error("Invalid username or password");
+      } else if (message.includes("Invalid API key")) {
+        toast.error("Configuration error. Please contact support.");
       } else {
         toast.error(message);
       }
@@ -86,6 +106,7 @@ function AuthForm() {
   const handleGoogleAuth = async () => {
     setGoogleLoading(true);
     try {
+      const supabase = createClient();
       const { error } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {
@@ -94,6 +115,7 @@ function AuthForm() {
       });
       if (error) throw error;
     } catch (error: unknown) {
+      console.error("Google auth error:", error);
       toast.error(error instanceof Error ? error.message : "An error occurred");
       setGoogleLoading(false);
     }
@@ -195,6 +217,14 @@ function AuthForm() {
             </button>
           </p>
         </div>
+
+        {/* Debug Info */}
+        {debugInfo && (
+          <div className="mt-4 rounded-lg border border-[var(--border)] bg-[var(--bg-tertiary)] p-3 text-xs text-[var(--text-secondary)] flex items-center gap-2">
+            <AlertCircle size={14} />
+            <span>Debug: {debugInfo}</span>
+          </div>
+        )}
 
         <p className="mt-6 text-center text-xs text-[var(--text-secondary)]">
           By continuing, you agree to our{" "}
