@@ -17,7 +17,7 @@ export function Navbar() {
   ];
 
   return (
-    <nav className="fixed top-0 z-50 w-full border-b border-[var(--border)] bg-[var(--bg-primary)]/95 backdrop-blur-md">
+    <nav className="fixed top-0 z-50 w-full glass">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
         <Link href="/" className="flex items-center gap-2">
           <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-[var(--accent)] text-black font-bold">
@@ -49,7 +49,7 @@ export function Navbar() {
           {/* Theme Toggle */}
           <button
             onClick={toggleTheme}
-            className="rounded-full p-2 text-[var(--text-secondary)] transition-all hover:bg-[var(--bg-tertiary)] hover:text-[var(--accent)]"
+            className="glass-button rounded-full p-2 text-[var(--text-secondary)] transition-all hover:text-[var(--accent)]"
             aria-label="Toggle theme"
           >
             {theme === "dark" ? <Sun size={20} /> : <Moon size={20} />}
@@ -63,7 +63,7 @@ export function Navbar() {
           </Link>
           <Link
             href="/auth?signup=true"
-            className="rounded-lg bg-[var(--accent)] px-4 py-2 text-sm font-semibold text-black transition-all hover:opacity-90"
+            className="glass-button rounded-lg bg-[var(--accent)] px-4 py-2 text-sm font-semibold text-black transition-all hover:opacity-90"
           >
             Get Started
           </Link>
