@@ -26,7 +26,9 @@ function AuthForm() {
     // Debug: Check if env vars are available
     const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
     const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-    setDebugInfo(`URL: ${url ? '✓' : '✗'} | Key: ${key ? '✓' : '✗'}`);
+    const hasUrl = url && url.length > 0;
+    const hasKey = key && key.length > 0;
+    setDebugInfo(`URL: ${hasUrl ? '✓ ' + url.substring(0,20) + '...' : '✗'} | Key: ${hasKey ? '✓ (' + key.length + ' chars)' : '✗'}`);
   }, [searchParams]);
 
   // Auto-generate email from username
